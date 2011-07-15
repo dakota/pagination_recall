@@ -11,41 +11,50 @@
  */
 
 class PaginationRecallComponent extends Object {
-  var $components = array('Session');
-  var $Controller = null;
+  public $components = array('Session');
+  private $Controller = null;
+  private $options = array(
+	  'vars' => array('page', 'sort', 'direction')
+  );
 
-  function startup(&$controller) {
-    $this->Controller = & $controller;
+  public function initialize(&$controller, $settings = array()) {  
+	$this->Controller = & $controller;
 
+	$this->options = Set::merge($this->options, $settings);
+  }
+  
+  public function recallParams($redirect = false) {
+	//recall previous options
+	if ($this->Session->check("Pagination.{$this->Controller->modelClass}.options")) {
+		$options = $this->Session->read("Pagination.{$this->Controller->modelClass}.options");
+		
+		$this->Controller->passedArgs = array_merge($this->Controller->passedArgs, $options);
+		
+		if($redirect == true) {
+			$this->Session->delete("Pagination.{$this->Controller->modelClass}.options");
+			$this->Controller->redirect($this->Controller->passedArgs);
+		}
+	}	  
+  }
+  
+  public function saveParams() {
+	extract($this->options);
+	  
     $options = array_merge($this->Controller->params,
                            $this->Controller->params['url'],
                            $this->Controller->passedArgs
                           );
 
-    $vars = array('page', 'sort', 'direction');
     $keys = array_keys($options);
     $count = count($keys);
     
     for ($i = 0; $i < $count; $i++) {
-      if (!in_array($keys[$i], $vars)) {
+      if (!in_array($keys[$i], $vars) || is_numeric($keys[$i])) {
         unset($options[$keys[$i]]);
       }
     }
     
     //save the options into the session
-    if ($options) {
-      if ($this->Session->check("Pagination.{$this->Controller->modelClass}.options")) {
-        $options = array_merge($this->Session->read("Pagination.{$this->Controller->modelClass}.options"), $options);
-      }
-      
-      $this->Session->write("Pagination.{$this->Controller->modelClass}.options", $options);
-    }
-
-    //recall previous options
-    if ($this->Session->check("Pagination.{$this->Controller->modelClass}.options")) {
-      $options = $this->Session->read("Pagination.{$this->Controller->modelClass}.options");
-      $this->Controller->passedArgs = array_merge($this->Controller->passedArgs, $options);
-    }
+    $this->Session->write("Pagination.{$this->Controller->modelClass}.options", $options);
   }
 }
-?>
