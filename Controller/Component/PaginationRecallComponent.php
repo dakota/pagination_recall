@@ -19,7 +19,7 @@ class PaginationRecallComponent extends Component {
 		'vars' => array('page', 'sort', 'direction')
 	);
 
-	public function initialize(&$controller, $settings = array()) {
+	public function initialize(Controller $controller, $settings = array()) {
 		$this->Controller = & $controller;
 
 		$this->options = Set::merge($this->options, $settings);
