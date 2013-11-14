@@ -1,0 +1,13 @@
+{
+    "name": "dakota/pagination-recall",
+    "type": "cakephp-plugin",
+    "require": {
+        "composer/installers": "*"
+    },
+    "authors": [
+        {
+            "name": "Walther Lalk",
+            "email": "emailme@waltherlalk.com"
+        }
+    ]
+}
